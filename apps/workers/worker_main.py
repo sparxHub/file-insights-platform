@@ -1,5 +1,8 @@
-import asyncio, os
-from adapters.sqs_worker import SQSWorker
+import asyncio
+import os
+
+from apps.workers.sqs_worker import SQSWorker
+
 
 async def main():
     worker = SQSWorker()
