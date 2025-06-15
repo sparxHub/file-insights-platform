@@ -19,15 +19,23 @@ asyncio_mode = "auto"
 markers = [
   "asyncio: mark test to be run with asyncio",
 ]
+
 [dependency-groups]
 dev = [
-    "types-python-jose>=3.5.0.20250531",
-    "httpx>=0.28.1",
-    "pytest-asyncio>=1.0.0",
-    "boto3-stubs[s3]>=1.38.36",
+  "types-python-jose>=3.5.0.20250531",
+  "httpx>=0.28.1",
+  "pytest-asyncio>=1.0.0",
+  "boto3-stubs[s3]>=1.38.36",
+  "rich>=13.7.0",                # ← colored logs / console output
 ]
 
 [tool.mypy]
 python_version        = "3.11"
-ignore_missing_imports = true          # ← silence “missing stub” notes
+ignore_missing_imports = true
 plugins               = ["pydantic.mypy"]
+
+[tool.pdm]
+distribution = false
+
+[tool.pdm.build]
+includes = []                         # ← 2) skip package discovery entirely

@@ -1,5 +1,5 @@
 # tests/conftest.py
-
+import logging
 from collections.abc import AsyncGenerator
 from datetime import datetime, timedelta
 
@@ -7,9 +7,19 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from jose import jwt
+from rich.logging import RichHandler  # ← colored log handler
 
 from apps.api.app.core.config import get_settings
 from apps.api.app.main import app
+
+# ----------------- rich logger setup -----------------
+logging.basicConfig(
+    level="INFO",
+    format="%(message)s",
+    handlers=[RichHandler(rich_tracebacks=True)],
+)
+logger = logging.getLogger(__name__)
+# -----------------------------------------------------
 
 settings = get_settings()
 
