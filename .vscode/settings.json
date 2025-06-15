@@ -1,0 +1,20 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": ["tests"],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true
+  },
+  "terminal.integrated.env.osx": {
+    "PYTHONBREAKPOINT": "ipdb.set_trace"
+  },
+  "python.analysis.typeCheckingMode": "basic",         // or "off"
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingTypeStubs": "none"                  // hush Pylance
+  }
+}

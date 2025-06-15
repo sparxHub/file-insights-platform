@@ -1,0 +1,38 @@
+
+---
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+*.egg-info/
+.venv/
+.mypy_cache/
+.pytest_cache/
+
+# --- PDM / Poetry / Pipenv ---
+pdm.lock
+poetry.lock
+Pipfile.lock
+
+# --- Node / React ---
+node_modules/
+dist/
+build/
+
+# --- IDEs & OS ---
+.idea/
+.DS_Store
+
+# --- Environment files ---
+.env
+*.env
+
+# --- Coverage & Logs ---
+.coverage
+htmlcov/
+*.log
+
+# --- Docker ---
+*.tar

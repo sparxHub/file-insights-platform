@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Backend: Dev Server",
+      "type": "shell",
+      "command": "pdm run uvicorn apps.api.app.main:app --reload"
+    },
+    {
+      "label": "Worker: SQS Stub",
+      "type": "shell",
+      "command": "pdm run python apps/workers/worker_main.py"
+    },
+    {
+      "label": "Tests",
+      "type": "shell",
+      "command": "pdm run pytest -q",
+      "problemMatcher": ["$pytest"]
+    },
+    {
+      "label": "Web: Dev Server",
+      "type": "shell",
+      "command": "npm --prefix apps/web run dev"
+    }
+  ]
+}

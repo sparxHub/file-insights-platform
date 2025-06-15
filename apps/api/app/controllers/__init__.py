@@ -1,0 +1,1 @@
+"""Thin request → service bindings."""
