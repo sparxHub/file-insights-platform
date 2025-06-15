@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Enhanced File Insights Platform with AI Processing Pipeline"
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+
+Resources:
+  # S3 Bucket with enhanced configuration
+  FileInsightsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "file-insights-${Environment}-${AWS::AccountId}"
+      VersioningConfiguration:
+        Status: Enabled
+      AccelerateConfiguration:
+        AccelerationStatus: Enabled
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: s3:ObjectCreated:*
+            Queue: !GetAtt ProcessingQueue.Arn
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: uploads/
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # SQS Queue for AI processing
+  ProcessingQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "file-insights-processing-${Environment}"
+      VisibilityTimeoutSeconds: 300
+      MessageRetentionPeriod: 1209600 # 14 days
+      DeadLetterQueue:
+        targetArn: !GetAtt ProcessingDLQ.Arn
+        maxReceiveCount: 3
+
+  ProcessingDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "file-insights-processing-dlq-${Environment}"
+
+  # Lambda Functions for AI Workers
+  VideoSummaryFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "file-insights-video-summary-${Environment}"
+      Runtime: python3.11
+      Handler: video_summary_worker.lambda_handler
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {"statusCode": 200, "body": "Video summary processing"}
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref UploadsTable
+          S3_BUCKET: !Ref FileInsightsBucket
+      Timeout: 300
+      MemorySize: 1024
+      ReservedConcurrencyLimit: 10
+
+  # IAM Roles and Policies
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: FileInsightsPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource: !Sub "${FileInsightsBucket}/*"
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:GetItem
+                Resource: !GetAtt UploadsTable.Arn
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                Resource: "*"
+
+  # CloudWatch Dashboard
+  FileInsightsDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub "FileInsights-${Environment}"
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  ["AWS/S3", "NumberOfObjects", "BucketName", "${FileInsightsBucket}"],
+                  ["AWS/Lambda", "Invocations", "FunctionName", "${VideoSummaryFunction}"]
+                ],
+                "period": 300,
+                "stat": "Sum",
+                "region": "${AWS::Region}",
+                "title": "Upload and Processing Metrics"
+              }
+            }
+          ]
+        }
