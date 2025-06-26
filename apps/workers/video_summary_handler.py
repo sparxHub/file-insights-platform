@@ -2,7 +2,7 @@ import json
 import logging
 from typing import Any, Dict
 
-from .ai_client import OpenAIClient
+from .ai_client import AIClient
 from .base_worker import BaseWorker
 
 logger = logging.getLogger(__name__)
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class VideoSummaryWorker(BaseWorker):
     def __init__(self):
         super().__init__()
-        self.ai_client = OpenAIClient()
+        self.ai_client = AIClient()
     
     async def process(self, upload_data: Dict[str, Any]) -> Dict[str, Any]:
         """Process video summary - stub implementation"""
@@ -33,6 +33,6 @@ class VideoSummaryWorker(BaseWorker):
         }
 
 # Lambda entry point
-def lambda_handler(event, context):
+async def lambda_handler(event, context):
     worker = VideoSummaryWorker()
-    return worker.handle_sqs_event(event, context)
+    return await worker.handle_sqs_event(event, context)

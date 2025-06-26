@@ -12,7 +12,7 @@ from typing import Any, Dict
 import pytest
 
 from apps.api.app.decorators.guards import RateLimitGuard
-from apps.api.app.models.upload import UploadChunkRequest, UploadInitiate, UploadStatus
+from apps.api.app.models.upload import Upload, UploadChunkRequest, UploadInitiate, UploadStatus
 
 
 # ---------------------------------------------------------------------------
@@ -96,10 +96,11 @@ def _monkeypatch_adapters(monkeypatch):
 
     async def fake_update_upload(self, upload_id, data):
         upload = _mem_uploads[upload_id]
-        # Update the Upload object with new field values
-        for field, value in data.items():
-            setattr(upload, field, value)
-        return upload
+        # Create a new upload by merging current data with updates
+        current_data = upload.model_dump()
+        current_data.update(data)
+        _mem_uploads[upload_id] = Upload.model_validate(current_data)
+        return _mem_uploads[upload_id]
 
     monkeypatch.setattr(
         "apps.api.app.adapters.dynamodb_adapter.DynamoDBAdapter.put_upload",
@@ -206,8 +207,10 @@ async def test_chunk_complete_success(client, token):
 
     assert res.status_code == 200
     data = res.json()
-    assert data["completed_parts"][0]["etag"] == VALID_ETAG
     assert data["status"] == UploadStatus.uploading.value
+    assert data["progress"] == 50.0  # First chunk of 2 completed
+    assert data["message"] == "Chunk 1 saved"
+    assert data["next_chunk"] == 2
 
 
 # # ---------------------------------------------------------------------------

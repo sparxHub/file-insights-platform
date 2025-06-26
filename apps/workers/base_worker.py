@@ -1,6 +1,7 @@
 import json
 import logging
 from abc import ABC, abstractmethod
+from datetime import datetime
 from typing import Any, Dict
 
 from ..api.app.adapters.dynamodb_adapter import DynamoDBAdapter
@@ -17,7 +18,7 @@ class BaseWorker(ABC):
         """Process the uploaded file and return insights"""
         pass
     
-    def handle_sqs_event(self, event, context):
+    async def handle_sqs_event(self, event, context):
         """Standard SQS event handler for all workers"""
         try:
             for record in event['Records']:

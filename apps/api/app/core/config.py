@@ -2,13 +2,14 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from .security import get_secure_jwt_secret
+
 
 class Settings(BaseSettings):
     # === App ===
     app_name: str = "File Upload Insights"
     debug: bool = False
     # === JWT ===
-    jwt_secret_key: str = "CHANGE_ME"
     jwt_algorithm: str = "HS256"
     jwt_expires_minutes: int = 60
     # === AWS ===
@@ -20,7 +21,12 @@ class Settings(BaseSettings):
     dynamodb_users_table: str = "file-insights-users"
     sqs_queue_url: str | None = None
 
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    
+    @property
+    def jwt_secret_key(self) -> str:
+        """Get secure JWT secret key"""
+        return get_secure_jwt_secret()
 
 
 @lru_cache

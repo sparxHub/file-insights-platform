@@ -8,8 +8,10 @@ dependencies = [
   "pydantic-settings>=2.2",
   "python-jose[cryptography]>=3.3",
   "boto3>=1.34",
+  "aioboto3>=13.0.0",
   "pytest>=8.0",
   "pydantic[email]>=2.11.7",
+  "structlog>=24.1.0",
 ]
 
 [tool.pytest.ini_options]
@@ -22,10 +24,12 @@ markers = [
 
 [dependency-groups]
 dev = [
+  "mypy>=1.8.0",
   "types-python-jose>=3.5.0.20250531",
   "httpx>=0.28.1",
   "pytest-asyncio>=1.0.0",
   "boto3-stubs[s3]>=1.38.36",
+  "types-aioboto3[essential]>=13.0.0",
   "rich>=13.7.0",                # ← colored logs / console output
 ]
 

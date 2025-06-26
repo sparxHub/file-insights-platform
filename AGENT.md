@@ -14,6 +14,13 @@
 - **Infrastructure**: CloudFormation templates in `infrastructure/cloudformation/`
 - **Database**: DynamoDB for metadata, S3 for file storage, SQS for async processing
 
+## Advanced Patterns
+- **Validation decorators**: `@validation([BodyValidation(Model)])` for request validation
+- **Guard system**: `@guards([AuthGuard(), RateLimitGuard(100)])` for security policies
+- **Guard combinations**: `@authenticated_user`, `@admin_only`, `@owner_or_admin` convenience decorators
+- **Dependency injection**: FastAPI `Depends()` for auth, services, adapters
+- **Request state**: `request.state.validated["body"]` for validated data access
+
 ## Code Style
 - **Naming**: PascalCase classes, snake_case functions/vars, UPPER_SNAKE_CASE constants
 - **Imports**: Standard → third-party → local (with blank lines), use relative imports with `..`

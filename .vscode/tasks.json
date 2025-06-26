@@ -15,7 +15,17 @@
       "label": "Tests",
       "type": "shell",
       "command": "pdm run pytest -q",
-      "problemMatcher": ["$pytest"]
+      "problemMatcher": ["$python"]
+    },
+    {
+      "label": "Build: Type Check",
+      "type": "shell",
+      "command": "pdm run mypy apps/ tests/",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$python"]
     },
     {
       "label": "Web: Dev Server",
