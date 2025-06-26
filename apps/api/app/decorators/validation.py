@@ -2,8 +2,7 @@ import json
 import logging
 from abc import ABC, abstractmethod
 from functools import wraps
-from inspect import signature
-from typing import Any, Callable, Dict, List, Optional, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type
 
 from fastapi import HTTPException, Request
 from pydantic import BaseModel, ValidationError
@@ -117,10 +116,6 @@ class CustomValidation(BaseValidation):
             raise HTTPException(status_code=422, detail=f"Custom validation failed: {str(e)}")
 
 def validation(validation_list: List[BaseValidation]):
-    """
-    Decorator to apply multiple validations to a route
-    Usage: @validation([BodyValidation(UploadInitiate), QueryValidation(PaginationQuery)])
-    """
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
@@ -147,16 +142,16 @@ def validation(validation_list: List[BaseValidation]):
                 except HTTPException:
                     raise
                 except Exception as e:
-                    log.error(f"Validation {validator.name} failed with error: {str(e)}")
-                    raise HTTPException(status_code=500, detail="Validation error")
+                    raise HTTPException(status_code=500, detail=f"Validation error: {str(e)}")
             
-            # Inject validated data into request state
+            # Set validated data in request state
             request.state.validated = validated_data
             
             # Execute the original function
             return await func(*args, **kwargs)
         
         return wrapper
+    
     return decorator
 
 # Pre-defined validation instances for common models

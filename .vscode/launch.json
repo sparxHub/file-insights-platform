@@ -1,0 +1,108 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    /* ──────────────────────────────────────────────────────────────
+       PyTest – debug ALL tests
+    ────────────────────────────────────────────────────────────── */
+    {
+      "name": "Pytest ‑ debug ALL tests",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "purpose": ["debug-test"],
+      "args": [
+        "-q",
+        "tests"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env"
+    },
+
+    /* ──────────────────────────────────────────────────────────────
+       PyTest – debug CURRENT file
+    ────────────────────────────────────────────────────────────── */
+    {
+      "name": "Pytest ‑ debug CURRENT file",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "purpose": ["debug-test"],
+      "args": [
+        "${file}"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env"
+    },
+
+    /* ──────────────────────────────────────────────────────────────
+       PyTest – prompt for a -k expression
+    ────────────────────────────────────────────────────────────── */
+    {
+      "name": "Pytest ‑ debug by name (-k)",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "purpose": ["debug-test"],
+      "args": [
+        "tests",
+        "-k",
+        "${input:testName}"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env"
+    },
+
+    /* ──────────────────────────────────────────────────────────────
+       Run FastAPI with uvicorn *outside* pytest and debug routes
+    ────────────────────────────────────────────────────────────── */
+    {
+      "name": "FastAPI – run & debug server (uvicorn)",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "apps.api.app.main:app",
+        "--host", "0.0.0.0",
+        "--port", "8000",
+        "--reload"
+      ],
+      "jinja": true,
+      "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+
+    /* ──────────────────────────────────────────────────────────────
+       Attach to a Python process (e.g. uvicorn already running
+       in a docker container or remote SSH session)
+    ────────────────────────────────────────────────────────────── */
+    {
+      "name": "Attach to Remote Python",
+      "type": "python",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 5678
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}",
+          "remoteRoot": "/app"
+        }
+      ],
+      "justMyCode": false
+    }
+  ],
+
+  "inputs": [
+    {
+      "id": "testName",
+      "type": "promptString",
+      "description": "Pytest -k expression (e.g. test_chunk_url_success)",
+      "default": ""
+    }
+  ]
+}
